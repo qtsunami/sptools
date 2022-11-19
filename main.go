@@ -1,8 +1,14 @@
 package main
 
-import "fmt"
+import (
+	"github.com/qtsunami/sptools/cmd"
+	"log"
+)
 
 func main() {
 
-	fmt.Println("hello world")
+	err := cmd.Execute()
+	if err != nil {
+		log.Fatalf("cmd.Execute err :%v", err)
+	}
 }
