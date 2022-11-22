@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -28,10 +29,12 @@ var duCmd = &cobra.Command{
 	Long:  longDesc,
 	Run: func(cmd *cobra.Command, args []string) {
 		// TODO
+
+		fmt.Println(multipath, unit)
 	},
 }
 
 func init() {
-	duCmd.Flags().StringVarP(&multipath, "multipath", "mp", "", "指定路径，多个路径以逗号相隔")
-	duCmd.Flags().StringVarP(&unit, "unit", "u", "", "显示单位:KB,MB,GB")
+	duCmd.Flags().StringVarP(&multipath, "multipath", "m", "./", "指定路径，多个路径以逗号相隔")
+	duCmd.Flags().StringVarP(&unit, "unit", "u", "KB", "显示单位:KB,MB,GB")
 }
