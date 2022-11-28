@@ -1,13 +1,13 @@
 package cmd
 
 import (
-	"fmt"
+	"github.com/qtsunami/sptools/internal/du"
 	"strings"
 
 	"github.com/spf13/cobra"
 )
 
-var multipath string
+var rpath string
 var unit string
 
 const (
@@ -30,11 +30,12 @@ var duCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		// TODO
 
-		fmt.Println(multipath, unit)
+		//fmt.Println(rpath, unit)
+		du.ScanRootPath(rpath)
 	},
 }
 
 func init() {
-	duCmd.Flags().StringVarP(&multipath, "multipath", "m", "./", "指定路径，多个路径以逗号相隔")
+	duCmd.Flags().StringVarP(&rpath, "path", "m", "./", "指定路径，多个路径以逗号相隔")
 	duCmd.Flags().StringVarP(&unit, "unit", "u", "KB", "显示单位:KB,MB,GB")
 }
