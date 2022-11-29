@@ -9,56 +9,79 @@ import (
 	"sync"
 )
 
-func ScanRootPath(dir string) {
+type Storage struct {
+	Index    int
+	Path     string
+	Name     string
+	FileSize int64
+}
+
+type Data struct {
+	Path   string
+	NFile  int
+	NBytes int64
+}
+
+func Start(dir string) map[int]*Data {
 
 	var roots = strings.Split(dir, ",")
 
-	fileSize := make(chan int64)
+	var storage = make(chan Storage)
+	var lret = make(map[int]*Data)
 
 	var wg sync.WaitGroup
 
-	for _, root := range roots {
+	for index, root := range roots {
+		lret[index] = &Data{
+			Path:   root,
+			NFile:  0,
+			NBytes: 0,
+		}
 		wg.Add(1)
-		go walkDir(root, &wg, fileSize)
+		go walkSingleDir(root, index, &wg, storage)
 	}
 
 	go func() {
 		wg.Wait()
-		close(fileSize)
+		close(storage)
 	}()
 
-	var nfiles, nbytes int64
-	for size := range fileSize {
-		nfiles++
-		nbytes += size
+	for item := range storage {
+		lret[item.Index].NFile = lret[item.Index].NFile + 1
+		lret[item.Index].NBytes = lret[item.Index].NBytes + item.FileSize
 	}
 
-	printDiskUsage(nfiles, nbytes)
+	return lret
 }
 
 func printDiskUsage(nfiles, nbytes int64) {
 	fmt.Printf("%d files  %.1f GB\n", nfiles, float64(nbytes)/1e9)
 }
-
-func walkDir(root string, wg *sync.WaitGroup, fileSize chan<- int64) {
+func walkSingleDir(root string, index int, wg *sync.WaitGroup, storage chan<- Storage) {
 	defer wg.Done()
 	for _, entry := range dirents(root) {
 		if entry.IsDir() {
 			wg.Add(1)
 			subdir := filepath.Join(root, entry.Name())
-			go walkDir(subdir, wg, fileSize)
+			go walkSingleDir(subdir, index, wg, storage)
 		} else {
-			fileSize <- entry.Size()
+			newStorage := Storage{
+				index,
+				root,
+				entry.Name(),
+				entry.Size(),
+			}
+			storage <- newStorage
 		}
 	}
 }
 
 var sema = make(chan struct{}, 20)
 
-func dirents(path string) []os.FileInfo {
+func dirents(dir string) []os.FileInfo {
 	sema <- struct{}{}
 	defer func() { <-sema }()
-	entries, err := ioutil.ReadDir(path)
+	entries, err := ioutil.ReadDir(dir)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "du1: %v\n", err)
 		return nil

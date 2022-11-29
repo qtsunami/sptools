@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"github.com/qtsunami/sptools/internal/du"
 	"strings"
 
@@ -31,7 +32,7 @@ var duCmd = &cobra.Command{
 		// TODO
 
 		//fmt.Println(rpath, unit)
-		du.ScanRootPath(rpath)
+		fmt.Println(du.Start(rpath))
 	},
 }
 
