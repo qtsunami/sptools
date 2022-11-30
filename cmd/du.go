@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"github.com/qtsunami/sptools/internal/du"
 	"strings"
 
@@ -12,9 +11,9 @@ var rpath string
 var unit string
 
 const (
-	UNIT_KB = iota + 1
-	UNIT_MB
-	UNIT_GB
+	UNIT_KB = "KB"
+	UNIT_MB = "MB"
+	UNIT_GB = "GB"
 )
 
 var longDesc = strings.Join([]string{
@@ -30,9 +29,22 @@ var duCmd = &cobra.Command{
 	Long:  longDesc,
 	Run: func(cmd *cobra.Command, args []string) {
 		// TODO
+		bdata := du.Start(rpath)
 
-		//fmt.Println(rpath, unit)
-		fmt.Println(du.Start(rpath))
+		for _, item := range bdata {
+			var size float64
+			switch unit {
+			case UNIT_KB:
+				size = float64(item.NBytes) / 1e3
+			case UNIT_MB:
+				size = float64(item.NBytes) / 1e6
+			case UNIT_GB:
+				size = float64(item.NBytes) / 1e9
+			default:
+				size = float64(item.NBytes) / 1e3
+			}
+			du.PrintDiskUsage(item.Path, item.NFile, size, unit)
+		}
 	},
 }
 

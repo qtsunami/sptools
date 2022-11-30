@@ -54,8 +54,8 @@ func Start(dir string) map[int]*Data {
 	return lret
 }
 
-func printDiskUsage(nfiles, nbytes int64) {
-	fmt.Printf("%d files  %.1f GB\n", nfiles, float64(nbytes)/1e9)
+func PrintDiskUsage(path string, nfiles int, nsize float64, unit string) {
+	fmt.Printf("%s\t %d files  \t%.1f %s\n", path, nfiles, nsize, unit)
 }
 func walkSingleDir(root string, index int, wg *sync.WaitGroup, storage chan<- Storage) {
 	defer wg.Done()
