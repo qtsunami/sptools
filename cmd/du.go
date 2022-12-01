@@ -28,9 +28,7 @@ var duCmd = &cobra.Command{
 	Short: "查看指定目录的占用空间",
 	Long:  longDesc,
 	Run: func(cmd *cobra.Command, args []string) {
-		// TODO
 		bdata := du.Start(rpath)
-
 		for _, item := range bdata {
 			var size float64
 			switch unit {
