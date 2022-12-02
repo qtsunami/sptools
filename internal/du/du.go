@@ -1,3 +1,13 @@
+/*
+du command is a package of calculate directory size
+
+the command receive two params:
+- path: the goal directory of calculate, support multi directory path separated by ","
+- unit: the unit, e.g. KB，MB，GB
+
+...
+*/
+
 package du
 
 import (
